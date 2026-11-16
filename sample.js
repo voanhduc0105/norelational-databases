@@ -11,7 +11,7 @@
 // the same commands mongosh sends to the database.
 // ------------------------------------------------------------
 
-const { MongoClient } = require("mongodb");
+const { MongoClient, Collection } = require("mongodb");
 
 // The connection string tells the driver where MongoDB is running.
 // "mongodb://localhost:27017" is the default for a local installation.
@@ -45,6 +45,13 @@ async function main() {
   //
   // Do the same here. Insert one book that has a publisher field
   // containing an embedded object with at least a name and a country.
+  await books.insertOne({
+    "title": "How to play chess",
+    "publisher": {
+      "name": "John Chessman",
+      "country": "France"
+    }
+  });
 
   // ----------------------------------------------------------
   // TODO 2 - insertOne with an array
@@ -52,17 +59,67 @@ async function main() {
   // Insert one book that has a tags field containing
   // an array of at least 3 strings.
 
+await books.insertOne({
+  "title": "Famous chess openings",
+  "tags": ["horror", "thriller", "best seller"]
+});
+
   // ----------------------------------------------------------
   // TODO 3 - insertMany
   // ----------------------------------------------------------
   // Insert at least 5 books in a single call using insertMany.
   // Include a mix: some with a publisher object, some with tags, some with both.
 
+await books.insertMany([
+  {
+    "title": "How to increase ram prices by 5000%",
+    "publisher": {
+      "name": "Sam Altman",
+      "country": "America",
+    }
+  },
+
+  {
+    "title": "Do chairs exist?",
+    "publisher": {
+      "name": "Michael Vsauce",
+      "country": "America"
+    },
+    "tags": ["psycological horror", "true crime", "best seller"]
+  },
+
+  {
+    "title": "General knowledge everyone should know.",
+    "tags": ["comedy", "romance", "fiction"]
+  },
+
+  {
+    "title": "How to solve 50% of your life's problem",
+    "publisher": {
+      "name": "John Life Solver",
+      "country": "India"
+    }
+  },
+
+  {
+    "title": "I bought two books. You should too!",
+    "publisher": {
+      "name": "William Book Buyer",
+      "country": "Russia"
+    }
+  }
+]);
+
   // ----------------------------------------------------------
   // TODO 4 - find all documents
   // ----------------------------------------------------------
   // Retrieve every document in the collection and log each title.
   // Hint: find() returns a cursor - call .toArray() to get an array.
+  const td4 = await books.find().toArray();
+  for (let title of td4){
+    console.log(title);
+  };
+
 
   // ----------------------------------------------------------
   // TODO 5 - findOne with dot notation
@@ -71,6 +128,8 @@ async function main() {
   // Dot notation lets you filter on a field inside an embedded object:
   //   { "publisher.country": "France" }
   // Log the title of the result.
+  const td5 = await books.findOne( {"publisher.country": "France"} );
+  console.log(td5);
 
   // ----------------------------------------------------------
   // TODO 6 - find with a filter
@@ -78,12 +137,21 @@ async function main() {
   // Find all books whose publisher.country is "France".
   // Log how many there are and list their titles.
 
+  const td6 = await books.find( {"publisher.country": "France"} ).toArray();
+  for (let title of td6){
+    console.log(title);
+  };
+
   // ----------------------------------------------------------
   // TODO 7 - find with $exists
   // ----------------------------------------------------------
   // Find all books that have a tags field, regardless of its value.
   //   { tags: { $exists: true } }
   // Log each title and its tags array.
+  const td7 = await books.find({ tags:{ $exists: true } }).toArray();
+  for (let title of td7){
+    console.log(title);
+  }
 
   // Always close the connection when you are done.
   await client.close();
