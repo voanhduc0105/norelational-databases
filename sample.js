@@ -152,7 +152,6 @@ await books.insertMany([
   for (let title of td7){
     console.log(title);
   }
-
   // Always close the connection when you are done.
   await client.close();
 }
